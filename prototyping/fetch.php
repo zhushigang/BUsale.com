@@ -1,4 +1,10 @@
 <?php
+/*
+Filename: fetch.php
+Description: API interface and front end display script for prototype 1
+Created by: Shigang Zhu
+Last modified by: Shigang Zhu
+*/
 // this file is modified base on this one found on stackoverflow: 
 // http://stackoverflow.com/questions/18458038/how-to-use-instagram-api-to-fetch-image-with-certain-hashtag
 function callInstagram($url)
