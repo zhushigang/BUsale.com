@@ -1,4 +1,15 @@
 <?php
+// This is the methods used to cache data locally. 
+/*
+Filename: cache.php
+Description: Background script which will be excuted periodicly to update the database
+			with the data fetched from an instagram API
+Created by: Shigang Zhu
+Last modified by: Shigang Zhu
+*/
+include 'convert.php';
+include 'Database.php';
+
 function callInstagram($url)
 {
 $ch = curl_init();
@@ -54,5 +65,29 @@ while($image_older_url!=Null){
 }
 $mydate=getdate(date("U"));
 echo "Updated on $mydate[hours]: $mydate[minutes] ,$mydate[weekday], $mydate[month] $mydate[mday], $mydate[year]\n";
+
+// convert everything into images
+
+$images = convert($json);
+echo "Objects created \n";
+//echo var_dump($images);
+// Query db to store data. 
+$rows = array();
+$i = 0;
+foreach ($images as $image)
+{
+	if($image->user!='rialb_d'){
+		$rows[$i] = array('user' => $image->user, 'url' => $image->url, 'caption' => $image->caption, 'id' => $image->image_id);
+		$i=$i+1;
+	}
+}
+//echo var_dump($rows);
+$col_names = array('user', 'url', 'caption', 'id');
+$db123 = new Database();
+//$_rows = array();
+//$_rows[] = array('user' => "phptest123", 'url' => "te", 'caption' => 'dra', 'id' => '1234');
+//echo var_dump($_rows[0]);
+//echo var_dump($rows[0]);
+$db123->insertRows("Prototype1", $col_names, $rows);
 return $json;
 ?>
