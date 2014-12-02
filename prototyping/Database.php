@@ -55,7 +55,7 @@ class Database {
     }
 
     /**
-     * Fetch all rows in the requested table
+     * Fetch all rows in the requested table into an associative array
      * @param   String $table_name: The name of the table to fetch
      * @return  An array of arrays of the data of each row
      */
