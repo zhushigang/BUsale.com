@@ -10,6 +10,7 @@ Last modified by: Shigang Zhu
 include 'convert.php';
 include 'Database.php';
 require_once '/home/BUSaleCredentials/DatabaseCredentials.php';
+require_once 'Blacklist.php';
 
 function callInstagram($url)
 {
@@ -77,7 +78,7 @@ $rows = array();
 $i = 0;
 foreach ($images as $image)
 {
-	if($image->user!='rialb_d'){
+	if(blacklist($image)){
 		$rows[$i] = array('user' => $image->user, 'url' => $image->url, 'caption' => $image->caption, 'id' => $image->image_id);
 		$i=$i+1;
 	}
@@ -91,7 +92,18 @@ $db123 = new Database($credentials['db_name'], $credentials['db_host_address'],
 //$_rows[] = array('user' => "phptest123", 'url' => "te", 'caption' => 'dra', 'id' => '1234');
 //echo var_dump($_rows[0]);
 //echo var_dump($rows[0]);
+$db123->query("DELETE FROM `Prototype1` WHERE 1");
 $db123->insertRows("Prototype1", $rows);
-$db123->deleteRows("Prototype1", array('url'=>'*'));
 return $json;
+
+
+function blacklist($image){
+	$bl = Blacklist::get();
+	foreach($bl as $b){
+		if ($image->user==$b){
+			return false;
+		}
+	}
+	return true;
+}
 ?>
