@@ -9,6 +9,7 @@ Last modified by: Shigang Zhu
 */
 include 'convert.php';
 include 'Database.php';
+require_once '/home/BUSaleCredentials/DatabaseCredentials.php';
 
 function callInstagram($url)
 {
@@ -83,11 +84,14 @@ foreach ($images as $image)
 }
 //echo var_dump($rows);
 $col_names = array('user', 'url', 'caption', 'id');
-$db123 = new Database();
+$credentials = DatabaseCredentials::get();
+$db123 = new Database($credentials['db_name'], $credentials['db_host_address'], 
+                                 $credentials['db_username'], $credentials['db_password']);
 //$_rows = array();
 //$_rows[] = array('user' => "phptest123", 'url' => "te", 'caption' => 'dra', 'id' => '1234');
 //echo var_dump($_rows[0]);
 //echo var_dump($rows[0]);
-$db123->insertRows("Prototype1", $col_names, $rows);
+$db123->insertRows("Prototype1", $rows);
+$db123->deleteRows("Prototype1", array('url'=>'*'));
 return $json;
 ?>
