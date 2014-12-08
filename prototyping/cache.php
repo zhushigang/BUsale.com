@@ -92,7 +92,7 @@ $db123 = new Database($credentials['db_name'], $credentials['db_host_address'],
 //$_rows[] = array('user' => "phptest123", 'url' => "te", 'caption' => 'dra', 'id' => '1234');
 //echo var_dump($_rows[0]);
 //echo var_dump($rows[0]);
-$db123->query("DELETE FROM `Prototype1` WHERE 1");
+$db123->deleteRows("Prototype1", array("1"=>"1"));
 $db123->insertRows("Prototype1", $rows);
 return $json;
 

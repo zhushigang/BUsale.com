@@ -16,7 +16,7 @@ class Image
 	
 	function Image($image_id,$url,$caption,$user)
 	{
-		$crc = crc32($image_id);
+		$crc = $image_id;
 		$this->image_id = strval($crc);
 		$this->url = $url;
 		$this->caption = $caption;
