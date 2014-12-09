@@ -16,7 +16,7 @@ class Image
 	
 	function Image($image_id,$url,$caption,$user)
 	{
-		$crc = $image_id;
+		$crc = crc32($image_id);
 		$this->image_id = strval($crc);
 		$this->url = $url;
 		$this->caption = $caption;
@@ -28,15 +28,18 @@ class Image
 
 function convert($jsonArray){
 	$images = array();
-	foreach($jsonArray['data'] as $item){
-		$image_link = $item['images']['low_resolution']['url'];
-		$image_caption = $item['caption']['text'];
-		$image_owner = $item['user']['username'];
-		$image_id = $item['id'];
-		$image = new Image($image_id,$image_link,$image_caption,$image_owner);
-		array_push($images,$image);
+	echo gettype($jsonArray);
+	echo var_dump($jsonArray);
+	foreach($jsonArray as $json){
+		foreach($json['data'] as $item){
+			$image_link = $item['images']['low_resolution']['url'];
+			$image_caption = $item['caption']['text'];
+			$image_owner = $item['user']['username'];
+			$image_id = $item['id'];
+			$image = new Image($image_id,$image_link,$image_caption,$image_owner);
+			array_push($images,$image);
+		}
 	}
-	
 	return $images;
 }
 
