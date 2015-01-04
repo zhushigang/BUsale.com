@@ -1,4 +1,4 @@
 BUsale.com
 ==========
 
-I will edit it on Wednesday night
+Class project, no plan for any improvement or updates yet. 
