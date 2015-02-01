@@ -2,19 +2,19 @@
 /**
 * A simple wrapper class for a MySQL PDO database handler 
 *
-* Selection, deletion, updating, and inserting are supported
-* The where part of the statements only supports "=". It does not support "!=" or "LIKE".
+* Selection, deletion, updating, and insertion are supported
+* The where part of the statements only supports "=". It does not support "!=", "LIKE" or joins.
 *
 * @author Aldwin Huynh
 */
 
 class Database {
-    //Required database information
+    // Required database information
     private $db_host_address;
     private $db_username;
     private $db_password;
     private $db_name;
-    //PDO Database handler
+    // PDO Database handler
     private $database = null;
 
     public function __construct($db_name, $host_address, $username, $password) {
@@ -30,14 +30,14 @@ class Database {
      * Connect to database and set $this->database to PDO object
      */
     private function connect() {
-    	//Catch exception in case PDO throws exception with credentials in message
-    	try {
-        	$this->database = new PDO("mysql:host=" . $this->db_host_address . ";dbname=" . $this->db_name, $this->db_username, $this->db_password);
-    	}catch(Exception $e) {
-    		throw new Exception("Could not connect to database. ");
-    	}
-        //Allow for exceptions
-    	$this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Catch exception in case PDO throws exception with credentials in message
+        try {
+            $this->database = new PDO("mysql:host=" . $this->db_host_address . ";dbname=" . $this->db_name, $this->db_username, $this->db_password);
+        }catch(Exception $e) {
+            throw new Exception("Could not connect to database. ");
+        }
+        // Allow for exceptions
+        $this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     /**
@@ -65,16 +65,16 @@ class Database {
         return $query_result->fetchAll(PDO::FETCH_ASSOC);
     }
 
-	/**
-	 * Select all rows from a table that matches requested where values
-	 * @param  String $table_name : The name of the table to fetch
-	 * @param  Array $where_values: Mapping of column to values for where part of the SQL statement
+    /**
+     * Select all rows from a table that matches requested where values
+     * @param  String $table_name : The name of the table to fetch
+     * @param  Array $where_values: Mapping of column to values for where part of the SQL statement
      * @return An array of arrays of the data of each row
-	 *
-	 */
+     *
+     */
     public function selectRows($table_name, array $where_values) {
-    	$sql = Database::createSQLFromWhereStatement("SELECT *", $table_name, $where_values);
-    	$stmt = $this->prepareAndExec($sql, array_values($where_values));
+        $sql = Database::createSQLFromWhereStatement("SELECT *", $table_name, $where_values);
+        $stmt = $this->prepareAndExec($sql, array_values($where_values));
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -85,42 +85,42 @@ class Database {
      * @return int   $rows_inserted: The number of rows inserted
      */ 
     public function insertRows($table_name, array $rows) {
-    	$this->database->beginTransaction();
+        $this->database->beginTransaction();
         $rows_inserted = 0;
-    	//Consider only preparing once to speed up time but would need same column length in every row
-    	foreach($rows as $row) {
-    		$rows_inserted += $this->insertRow($table_name, $row);
-	    }
-	    //Only committ if all inserts are successful
-	    $this->database->commit();
+        // Consider only preparing once to speed up time but would need same column length in every row
+        foreach($rows as $row) {
+            $rows_inserted += $this->insertRow($table_name, $row);
+        }
+        // Only committ if all inserts are successful
+        $this->database->commit();
 
         return $rows_inserted;
     }
 
-	/**
+    /**
      * Insert a row into the requested table in the database
      * @param  String $table_name: The name of the table to insert into
      * @param  Array $row:        The row to insert into the table
      * @return 1 on success
      */ 
     private function insertRow($table_name, array $row) {
-    	//Comma separated column names
-	    $col_names= implode(',', array_keys($row));
-	    //Comma separated place "?" placeholders
-	    $field_placeholders = rtrim(str_repeat('?,', count($row)), ",");
+        // Comma separated column names
+        $col_names= implode(',', array_keys($row));
+        // Comma separated place "?" placeholders
+        $field_placeholders = rtrim(str_repeat('?,', count($row)), ",");
 
-	    $sql = "INSERT INTO  $table_name ($col_names) VALUES ($field_placeholders)";
-	    $stmt = $this->prepareAndExec($sql, $row);
-	    return $stmt->rowCount();
+        $sql = "INSERT INTO  $table_name ($col_names) VALUES ($field_placeholders)";
+        $stmt = $this->prepareAndExec($sql, $row);
+        return $stmt->rowCount();
     }
 
     /**
-	 * Update all rows from a table that matches the inputted where values with set values
-	 * @param  String $table_name : The name of the table to fetch
+     * Update all rows from a table that matches the inputted where values with set values
+     * @param  String $table_name : The name of the table to fetch
      * @param  Array $set_values  : Mapping of column to values for set part of the SQL statement
-	 * @param  Array $where_values: Mapping of column to values for where part of the SQL statement
+     * @param  Array $where_values: Mapping of column to values for where part of the SQL statement
      * @return Number of rows updated
-	 */
+     */
     public function updateRows($table_name, array $set_values, array $where_values) {
         
         $set_placeholders   = Database::createWherePlaceHolders($set_values);
@@ -128,7 +128,7 @@ class Database {
 
         $sql  = "UPDATE $table_name SET $set_placeholders WHERE $where_placeholders";
         $stmt = $this->prepareAndExec($sql, array_merge($set_values, $where_values));
-        //Return number of rows affected
+        // Return number of rows affected
         return $stmt->rowCount();
     }
 
@@ -139,9 +139,9 @@ class Database {
      * @return Number of rows deleted
      */
     public function deleteRows($table_name, array $where_values) {
-    	$sql  = Database::createSQLFromWhereStatement("Delete", $table_name, $where_values);
+        $sql  = Database::createSQLFromWhereStatement("Delete", $table_name, $where_values);
         $stmt = $this->prepareAndExec($sql, $where_values);
-        //Return number of rows affected
+        // Return number of rows affected
         return $stmt->rowCount();
     }
 
@@ -154,7 +154,7 @@ class Database {
      *
      */
     private static function createSQLFromWhereStatement($beginning, $table_name, array $where_values) {
-    	$where_placesholders = Database::createWherePlaceHolders($where_values);
+        $where_placesholders = Database::createWherePlaceHolders($where_values);
         $sql  = $beginning . " FROM $table_name WHERE $where_placesholders";
         return $sql;
     }
@@ -167,11 +167,11 @@ class Database {
      *
      */
     private function prepareAndExec($sql, array $placeholder_values=null) {
-		$stmt = $this->database->prepare($sql);
+        $stmt = $this->database->prepare($sql);
         if(isset($placeholder_values)) {
-        	$stmt->execute(array_values($placeholder_values));
+            $stmt->execute(array_values($placeholder_values));
         } else {
-        	$stmt->execute();
+            $stmt->execute();
         }
         return $stmt;
     }
@@ -190,7 +190,7 @@ class Database {
     }
 
     public function tests(){
-        //Test fetchAll(), insertRows(), updateRows(), and deleteRows()
+        // Test fetchAll(), insertRows(), updateRows(), and deleteRows()
         print("Before:\n");
         print_r($this->fetchAll("test1"));
         $rows = array();
@@ -204,5 +204,3 @@ class Database {
         print_r($this->fetchAll("test1"));
     }
 }
-
-
